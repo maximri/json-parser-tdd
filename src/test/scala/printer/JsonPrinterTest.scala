@@ -1,9 +1,9 @@
 package printer
 
+import data.SampleData
+import data.SampleData._
 import org.specs2.mutable.SpecificationWithJUnit
 import org.specs2.specification.Scope
-import parser.JsonPrinter
-import parser.SampleData._
 
 /**
  * Created by maximribakov on 7/23/14.

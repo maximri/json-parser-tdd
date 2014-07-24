@@ -1,12 +1,13 @@
 package parser
 
+import data.SampleData
 import org.specs2.mutable.SpecificationWithJUnit
 import org.specs2.specification.Scope
 
 
 class JsonParserTest extends SpecificationWithJUnit {
 
-  import parser.SampleData._
+  import SampleData._
 
   trait Context extends Scope {
     val parser = JsonParser

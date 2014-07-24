@@ -1,4 +1,4 @@
-package parser
+package data
 
 import domain._
 
