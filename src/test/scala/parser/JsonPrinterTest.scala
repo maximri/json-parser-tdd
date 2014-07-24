@@ -152,8 +152,6 @@ class JsonPrinterTest extends SpecificationWithJUnit {
           JsonObject(Map("keyInner" -> JsonString("valueInner"),
             "keyInner2" -> JsonNull))))) === """{"key":{"keyInner":"valueInner","keyInner2":null}}"""
     }
-
-
   }
 
 }
