@@ -2,42 +2,26 @@ package parser
 
 import domain._
 
-import scala.collection.immutable.Map
-import scala.collection.mutable.ListBuffer
-
 /**
- * Created by maximribakov on 7/22/14.
+ * Created by maxim ribakov on 7/22/14.
  */
 object JsonParser {
 
   def parseJsonObject(blob: String): JsonObject = {
-    val content: String = dropExpectedEdges(blob.trim, ('{', '}'))
-
-    var pairs: Map[String, JsonValue] = Map.empty
-
-    val separatedPairs = extractElements(content, ',')
-
-    for (pair <- separatedPairs if !pair.isEmpty) {
-      val (key, value) = parsePair(pair)
-      pairs += (key -> value)
-    }
-
-    JsonObject(pairs)
+    JsonObject(parseCompoundJsonElement(blob, ('{', '}'), parsePair).toMap)
   }
 
   def parseJsonArray(blob: String): JsonValue = {
-    val content: String = dropExpectedEdges(blob.trim, ('[', ']'))
-
-    var values = new ListBuffer[JsonValue]
-
-    val separatedValues = extractElements(content, ',')
-
-    for (value <- separatedValues if !value.isEmpty) {
-      values += parseJsonValue(value)
-    }
-
-    JsonArray(values: _*)
+    JsonArray(parseCompoundJsonElement(blob, ('[', ']'), parseJsonValue): _*)
   }
+
+  private def parseCompoundJsonElement[T](blob: String, expectedEdges: (Char, Char), elementParser: String => T) = {
+    val content = dropExpectedEdges(blob.trim, expectedEdges)
+    val separatedElements = extractElements(content, ',')
+
+    separatedElements.filter(!_.isEmpty).map(elementParser)
+  }
+
 
   private def extractElements(jsonPart: String, separator: Char) = {
     val splitPartialElementsByComma = jsonPart.split(separator)
@@ -45,7 +29,7 @@ object JsonParser {
     case class ElementsAccumulator(bracesDiff: Int = 0, accumulatedElement: String = "", elements: Seq[String] = Seq()) {
       def accumulate(partialElement: String) = {
         val newBracesDiff = this.bracesDiff + ((partialElement.count(_ == '[') - partialElement.count(_ == ']')) +
-                                                  (partialElement.count(_ == '{') - partialElement.count(_ == '}')))
+          (partialElement.count(_ == '{') - partialElement.count(_ == '}')))
         if (newBracesDiff == 0)
           completeAccumulationOfElement(partialElement)
         else
@@ -53,6 +37,7 @@ object JsonParser {
       }
 
       def completeAccumulationOfElement(curValue: String) = ElementsAccumulator(elements = elements :+ (accumulatedElement + curValue))
+
       def continueAccumulationOfElement(curValue: String, bracesDiff: Int) = ElementsAccumulator(bracesDiff, accumulatedElement + curValue + ",", elements)
     }
 

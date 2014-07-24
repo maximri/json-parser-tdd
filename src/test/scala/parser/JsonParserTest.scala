@@ -1,15 +1,12 @@
 package parser
 
-import domain._
 import org.specs2.mutable.SpecificationWithJUnit
 import org.specs2.specification.Scope
 
-import scala.collection.immutable.Map
 
-/**
- * Created by maximribakov on 7/22/14.
- */
 class JsonParserTest extends SpecificationWithJUnit {
+
+  import parser.SampleData._
 
   trait Context extends Scope {
     val parser = JsonParser
@@ -18,128 +15,95 @@ class JsonParserTest extends SpecificationWithJUnit {
   "JsonParser" should {
 
     "construct AST correctly for an empty string" in new Context {
-      parser.parseJsonObject("{}") === JsonObject()
+      parser.parseJsonObject(emptyObject.stringRep) === emptyObject.jsonValue
     }
 
     "construct AST correctly for one simple pair of domain.JsonNumber as value" in new Context {
-      parser.parseJsonObject( """{"key":3}""") === JsonObject(Map("key" -> JsonNumber(3)))
+      parser.parseJsonObject(objectWithOneNumber.stringRep) === objectWithOneNumber.jsonValue
     }
 
     "construct AST correctly for one simple pair of domain.JsonString as value" in new Context {
-      parser.parseJsonObject( """{"key":"3"}""") === JsonObject(Map("key" -> JsonString("3")))
+      parser.parseJsonObject(objectWithOneString.stringRep) === objectWithOneString.jsonValue
     }
 
     "construct AST correctly for one simple pair of JsonNull as value" in new Context {
-      parser.parseJsonObject( """{"key":null}""") === JsonObject(Map("key" -> JsonNull))
+      parser.parseJsonObject(objectWithOneNull.stringRep) === objectWithOneNull.jsonValue
     }
 
     "construct AST correctly for one simple pair of domain.JsonBoolean as value" in new Context {
-      parser.parseJsonObject( """{"key":true}""") === JsonObject(Map("key" -> JsonBoolean(true)))
+      parser.parseJsonObject(objectWithOneBoolean.stringRep) === objectWithOneBoolean.jsonValue
     }
 
     "construct AST correctly for one simple pair of empty Array as value" in new Context {
-      parser.parseJsonObject( """{"key":[]}""") === JsonObject(Map("key" -> JsonArray()))
+      parser.parseJsonObject(objectWithEmptyArray.stringRep) === objectWithEmptyArray.jsonValue
     }
 
     "construct AST correctly for one simple pair of an Array with domain.JsonNumber 3 value" in new Context {
-      parser.parseJsonObject( """{"key":[3]}""") === JsonObject(Map("key" -> JsonArray(JsonNumber(3))))
-    }
-
-    "construct AST correctly for one simple pair of an Array with domain.JsonNumber 4 value" in new Context {
-      parser.parseJsonObject( """{"key":[4]}""") === JsonObject(Map("key" -> JsonArray(JsonNumber(4))))
+      parser.parseJsonObject(objectWithAnArrayWithOneNumber.stringRep) === objectWithAnArrayWithOneNumber.jsonValue
     }
 
     "construct AST correctly for one simple pair of an Array with domain.JsonString value" in new Context {
-      parser.parseJsonObject( """{"key":["str"]}""") === JsonObject(Map("key" -> JsonArray(JsonString("str"))))
+      parser.parseJsonObject(objectWithAnArrayWithOneString.stringRep) === objectWithAnArrayWithOneString.jsonValue
     }
 
     "construct AST correctly for one simple pair of an empty domain.JsonObject as value" in new Context {
-      parser.parseJsonObject( """{"key":{}}""") === JsonObject(Map("key" -> JsonObject()))
-    }
-
-    "construct AST correctly for one simple pair of an empty domain.JsonObject as value" in new Context {
-      parser.parseJsonObject( """{"key":{}}""") === JsonObject(Map("key" -> JsonObject()))
+      parser.parseJsonObject(objectWithAnEmptyObjectInside.stringRep) === objectWithAnEmptyObjectInside.jsonValue
     }
 
     "construct AST correctly for two simple pairs of domain.JsonNumber as value" in new Context {
-      parser.parseJsonObject( """{"first":1,"second":2}""") === JsonObject(Map("first" -> JsonNumber(1), "second" -> JsonNumber(2)))
+      parser.parseJsonObject(objectWithTwoSimplePairsWithNumbers.stringRep) === objectWithTwoSimplePairsWithNumbers.jsonValue
     }
 
     "construct AST correctly for two simple pairs of domain.JsonNumber and domain.JsonString as value" in new Context {
-      parser.parseJsonObject( """{"first":1,"second":"2"}""") === JsonObject(Map("first" -> JsonNumber(1), "second" -> JsonString("2")))
+      parser.parseJsonObject(objectWithTwoSimplePairsOneNumberOneString.stringRep) === objectWithTwoSimplePairsOneNumberOneString.jsonValue
     }
 
     /*Recursion test*/
 
     /*Array single level*/
-    "construct AST correctly for one simple pair of an Array with two JsonString's as values" in new Context {
-      parser.parseJsonObject( """{"key":["str1","str2"]}""") === JsonObject(Map("key" -> JsonArray(JsonString("str1"), JsonString("str2"))))
+    "construct AST correctly for one complex pair of an Array with two JsonString's as values" in new Context {
+      parser.parseJsonObject(objectWithAnArrayWithTwoStrings.stringRep) === objectWithAnArrayWithTwoStrings.jsonValue
     }
 
     "construct AST correctly for one complex pair of an Array with two multipule values" in new Context {
-      parser.parseJsonObject( """{"key":["str1",4,null,"str2"]}""") === JsonObject(Map("key" -> JsonArray(JsonString("str1"), JsonNumber(4), JsonNull, JsonString("str2"))))
+      parser.parseJsonObject(objectWithAnArrayWithMultiple.stringRep) === objectWithAnArrayWithMultiple.jsonValue
     }
 
     /*Array double level*/
 
 
     "construct AST correctly for one complex pair of an Array with an Inner Array as value" in new Context {
-      parser.parseJsonObject( """{"key":["str1",["str2"]]}""") === JsonObject(Map("key" -> JsonArray(JsonString("str1"), JsonArray(JsonString("str2")))))
-    }
-
-    "construct AST correctly for one complex pair of an Array with an Inner Array with as single value as value" in new Context {
-      parser.parseJsonObject( """{"key":["str1",["str2"]]}""") === JsonObject(Map("key" -> JsonArray(JsonString("str1"), JsonArray(JsonString("str2")))))
+      parser.parseJsonObject(objectWithAnArrayWithOneStringAndSimpleInnerArray.stringRep) === objectWithAnArrayWithOneStringAndSimpleInnerArray.jsonValue
     }
 
     "construct AST correctly for one complex pair of an Array with an Inner Array with two values as value" in new Context {
-      parser.parseJsonObject( """{"key":["str1",["str2",7]]}""") === JsonObject(Map("key" -> JsonArray(JsonString("str1"), JsonArray(JsonString("str2"), JsonNumber(7)))))
+      parser.parseJsonObject(objectWithAnArrayWithOneStringAndInnerArrayWithTwoValues.stringRep) === objectWithAnArrayWithOneStringAndInnerArrayWithTwoValues.jsonValue
     }
 
     "construct AST correctly for one complex pair of an Array with an Inner Array with two values which one of them is an object as value" in new Context {
-      parser.parseJsonObject( """{"key":["str1",["str2",{"keyInner":"val"}]]}""") ===
-        JsonObject(Map("key" -> JsonArray(JsonString("str1"),
-          JsonArray(JsonString("str2"),
-            JsonObject(Map("keyInner" -> JsonString("val")))))))
+      parser.parseJsonObject(objectWithOneComplexArrayWithInnerArrayWithTwoValuesWhichOneIsObject.stringRep) === objectWithOneComplexArrayWithInnerArrayWithTwoValuesWhichOneIsObject.jsonValue
     }
-
     /*Object single level*/
 
     "construct AST correctly for one simple pair of an Object with one JsonObject with one pair as value" in new Context {
-      parser.parseJsonObject( """{"key":{"keyInner":"valueInner"}}""") === JsonObject(Map("key" -> JsonObject(Map("keyInner" -> JsonString("valueInner")))))
+      parser.parseJsonObject(objectWithInnerObjectWithOnePair.stringRep) === objectWithInnerObjectWithOnePair.jsonValue
     }
 
     "construct AST correctly for one simple pair of an Object with one JsonObject with two pairs as value" in new Context {
-      parser.parseJsonObject( """{"key":{"keyInner":"valueInner","secondInner":null}}""") ===
-        JsonObject(Map("key" ->
-          JsonObject(Map("keyInner" -> JsonString("valueInner"),
-            "secondInner" -> JsonNull))))
+      parser.parseJsonObject(objectWithInnerObjectWithTwoPairs.stringRep) === objectWithInnerObjectWithTwoPairs.jsonValue
     }
 
     /*Object double level*/
     "construct AST correctly for one pair of an Object with an Inner Object as value that has another Inner Object" in new Context {
-      parser.parseJsonObject( """{"key":{"keyInner":"valueInner","keyInnerObj":{"secondInner":null}}}""") ===
-        JsonObject(Map("key" ->
-          JsonObject(Map("keyInner" -> JsonString("valueInner"),
-            "keyInnerObj" -> JsonObject(Map("secondInner" -> JsonNull))))))
+      parser.parseJsonObject(objectWithInnerObjectWithTwoPairsWhichOneIsObjectWithOneElement.stringRep) === objectWithInnerObjectWithTwoPairsWhichOneIsObjectWithOneElement.jsonValue
     }
 
     "construct AST correctly for one pair of an Object with an Inner Object as value that has another Inner object with two elements" in new Context {
-      parser.parseJsonObject( """{"key":{"keyInner":"valueInner","keyInnerObj":{"secondInner":null,"secondInner2":7}}}""") ===
-        JsonObject(Map("key" ->
-          JsonObject(Map("keyInner" -> JsonString("valueInner"),
-            "keyInnerObj" -> JsonObject(Map("secondInner" -> JsonNull, "secondInner2" -> JsonNumber(7)))))))
+      parser.parseJsonObject(objectWithInnerObjectWithTwoPairsWhichOneIsObjectWithTwoElements.stringRep) === objectWithInnerObjectWithTwoPairsWhichOneIsObjectWithTwoElements.jsonValue
     }
 
     "construct AST correctly for one pair of an Object with an Inner Object as value that has another Inner Array with multipul elements" in new Context {
-      parser.parseJsonObject( """{"key":{"keyInner":"valueInner","keyInnerObj":["secondInner",null,"secondInner",7]}}""") ===
-        JsonObject(Map("key" ->
-          JsonObject(Map("keyInner" -> JsonString("valueInner"),
-            "keyInnerObj" -> JsonArray(JsonString("secondInner"),
-              JsonNull,
-              JsonString("secondInner"),
-              JsonNumber(7))))))
+      parser.parseJsonObject(objectWithInnerObjectWithTwoPairsWhichOneIsObjectWithMultipleElements.stringRep) === objectWithInnerObjectWithTwoPairsWhichOneIsObjectWithMultipleElements.jsonValue
     }
-
-
   }
 }
