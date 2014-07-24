@@ -45,6 +45,35 @@ object JsonParser {
       (accumulatorForFields, partialElement) => accumulatorForFields.accumulate(partialElement)).elements
   }
 
+  //TODO : remove after Shay review
+  private def separatePairs(content: String, separator: Char): Seq[String] = {
+    var pairs = Seq[String]()
+
+    var partialBlob = ""
+    var bracesBalanceCount = 0
+    for (element <- content.split(separator)) {
+
+      partialBlob = partialBlob + element
+
+      bracesBalanceCount = bracesBalanceCount + ((element.count(_ == '[') - element.count(_ == ']')) +
+        (element.count(_ == '{') - element.count(_ == '}')))
+
+      if (isSeparatedInsideByInnerElements) {
+        partialBlob += separator
+      }
+      else {
+        pairs = pairs :+ partialBlob
+        partialBlob = ""
+      }
+
+      def isSeparatedInsideByInnerElements: Boolean = {
+        bracesBalanceCount > 0
+      }
+    }
+
+    pairs
+  }
+
 
   def parsePair(blob: String): (String, JsonValue) = {
     val key = dropExpectedEdges(blob.trim.substring(0, blob.indexOf(':')), ('\"', '\"'))

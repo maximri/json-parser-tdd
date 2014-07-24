@@ -16,7 +16,6 @@ class JsonPrinterTest extends SpecificationWithJUnit {
 
   "JsonPrinter" should {
 
-
     "print AST correctly for an empty string" in new Context {
       printer.printJsonValue(emptyObject.jsonValue) === emptyObject.stringRep
     }
