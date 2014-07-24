@@ -4,6 +4,8 @@ import domain._
 import org.specs2.mutable.SpecificationWithJUnit
 import org.specs2.specification.Scope
 
+import scala.collection.immutable.Map
+
 /**
  * Created by maximribakov on 7/22/14.
  */
@@ -122,10 +124,10 @@ class JsonParserTest extends SpecificationWithJUnit {
     }
 
     "construct AST correctly for one pair of an Object with an Inner Object as value that has another Inner object with two elements" in new Context {
-      parser.parseJsonObject( """{"key":{"keyInner":"valueInner","keyInnerObj":{"secondInner":null,"secondInner":7}}}""") ===
+      parser.parseJsonObject( """{"key":{"keyInner":"valueInner","keyInnerObj":{"secondInner":null,"secondInner2":7}}}""") ===
         JsonObject(Map("key" ->
           JsonObject(Map("keyInner" -> JsonString("valueInner"),
-            "keyInnerObj" -> JsonObject(Map("secondInner" -> JsonNull, "secondInner" -> JsonNumber(7)))))))
+            "keyInnerObj" -> JsonObject(Map("secondInner" -> JsonNull, "secondInner2" -> JsonNumber(7)))))))
     }
 
     "construct AST correctly for one pair of an Object with an Inner Object as value that has another Inner Array with multipul elements" in new Context {

@@ -2,6 +2,7 @@ package parser
 
 import domain._
 
+import scala.collection.immutable.Map
 import scala.collection.mutable.ListBuffer
 
 /**
@@ -37,34 +38,6 @@ object JsonParser {
 
     JsonArray(values: _*)
   }
-
-//  private def separateElements(content: String, separator: Char): Seq[String] = {
-//    var elements: Seq[String] = Seq[String]()
-//
-//    var partialBlob = ""
-//    var bracesBalanceCount = 0
-//    for (element <- content.split(separator)) {
-//
-//      partialBlob = partialBlob + element
-//
-//      bracesBalanceCount = bracesBalanceCount + ((element.count(_ == '[') - element.count(_ == ']'))
-//        + (element.count(_ == '{') - element.count(_ == '}')))
-//
-//      if (isSeparatedInsideByInnerElements) {
-//        partialBlob += separator
-//      }
-//      else {
-//        elements = elements :+ partialBlob
-//        partialBlob = ""
-//      }
-//
-//      def isSeparatedInsideByInnerElements: Boolean = {
-//        bracesBalanceCount > 0
-//      }
-//    }
-//
-//    elements
-//  }
 
   private def extractElements(jsonPart: String, separator: Char) = {
     val splitPartialElementsByComma = jsonPart.split(separator)
